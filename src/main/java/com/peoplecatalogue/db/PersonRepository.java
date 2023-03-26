@@ -1,4 +1,4 @@
-package com.peoplecatalogue.domain;
+package com.peoplecatalogue.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
