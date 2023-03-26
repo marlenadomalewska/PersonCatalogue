@@ -1,4 +1,4 @@
-package com.peoplecatalogue.db;
+package com.peoplecatalogue.domain;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,13 +26,13 @@ public class PersonRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public Collection<Person> getAllPerson() {
+	public Collection<Person> personGetAll() {
 		RowMapper<Person> lambdaMapper = (rs, rowNum) -> new Person(rs.getInt("id"), rs.getString("first_name"),
 				rs.getString("last_name"));
 		return jdbcTemplate.query("SELECT id, first_name, last_name FROM person;", lambdaMapper);
 	}
 
-	public Person getPersonById(int id) {
+	public Person personGetById(int id) {
 		return jdbcTemplate.query("SELECT " + "p.id AS p_id," + "p.first_name, " + "p.last_name," + "a.id AS a_id,"
 				+ "a.city," + "a.street," + "a.house_number." + "a.postal_code," + "d.id AS d_id," + "d.name "
 				+ "FROM person p " + "LEFT JOIN address a ON a.id_person=p.id "
@@ -70,46 +70,46 @@ public class PersonRepository {
 		}
 	};
 
-	public void deletePerson(int id) {
+	public void personDelete(int id) {
 		jdbcTemplate.update("DELETE FROM dish WHERE id_person=?; " + "DELETE FROM address WHERE id_person=?;"
 				+ "DELETE FROM person WHERE id=?", id, id, id);
 	}
 
-	public void deleteAddress(int id) {
+	public void addressDelete(int id) {
 		jdbcTemplate.update("DELETE FROM address WHERE id=?;", id);
 	}
 
-	public void deleteDish(int id) {
+	public void dishDelete(int id) {
 		jdbcTemplate.update("DELETE FROM dish WHERE id=?;", id);
 	}
 
-	public void addPerson(Person person) {
+	public void personAdd(Person person) {
 		jdbcTemplate.update("INSERT INTO person (first_name, last_name) VALUES (?,?)", person.getFirstName(),
 				person.getLastName());
 	}
 
-	public void addAddress(int idPerson, PersonAddress address) {
+	public void addressAdd(int idPerson, PersonAddress address) {
 		jdbcTemplate.update(
 				"INSERT INTO address (city, street, house_number, postal_code, person_id) VALUES(?,?,?,?,?)",
 				address.getCity(), address.getStreet(), address.getHouseNumber(), address.getPostalCode(), idPerson);
 	}
 
-	public void addDish(int idPerson, PersonDish dish) {
+	public void dishAdd(int idPerson, PersonDish dish) {
 		jdbcTemplate.update("INSERT INTO address (name, person_id) VALUES(?,?)", dish.getName(), idPerson);
 	}
 
-	public void updatePerson(Person person) {
+	public void personUpdate(Person person) {
 		jdbcTemplate.update("UPDATE person SET first_name=?, last_name=? WHERE int id=?", person.getFirstName(),
 				person.getLastName(), person.getId());
 	}
 
-	public void updateAddress(PersonAddress address) {
+	public void addressUpdate(PersonAddress address) {
 		jdbcTemplate.update("UPDATE address SET city=?, street=?, house_number=?, postal_code=? WHERE int id=?",
 				address.getCity(), address.getStreet(), address.getHouseNumber(), address.getPostalCode(),
 				address.getId());
 	}
 
-	public void updateDish(PersonDish dish) {
+	public void dishUpdate(PersonDish dish) {
 		jdbcTemplate.update("UPDATE dish SET name=? WHERE id=?", dish.getName(), dish.getId());
 	}
 }

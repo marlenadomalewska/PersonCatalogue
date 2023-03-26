@@ -1,4 +1,4 @@
-package com.peoplecatalogue.domain;
+package com.peoplecatalogue.db;
 
 import java.util.Collection;
 
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.peoplecatalogue.db.PersonRepository;
+import com.peoplecatalogue.domain.PersonRepository;
 import com.peoplecatalogue.domain.objects.Person;
 
 @RestController
@@ -27,28 +27,28 @@ public class PersonController {
 
 	@GetMapping
 	public Collection<Person> getPersons() {
-		return repository.getAllPerson();
+		return repository.personGetAll();
 	}
 
 	@GetMapping("/{id}")
 	public Person getPerson(@PathVariable("id") int id) {
-		return repository.getPersonById(id);
+		return repository.personGetById(id);
 	}
 
 	@DeleteMapping("/{id}")
 	public void deletePerson(@PathVariable("id") int id) {
-		repository.deletePerson(id);
+		repository.personDelete(id);
 	}
 
 	@PostMapping
 	public void addPerson(@RequestBody Person person) {
-		repository.addPerson(person);
+		repository.personAdd(person);
 	}
 
 	@PutMapping("/{id}")
 	public void editPerson(@PathVariable("id") int id, @RequestBody Person person) {
 		person.setId(id);
-		repository.updatePerson(person);
+		repository.personUpdate(person);
 	}
 
 	/*
