@@ -1,1 +1,1 @@
-# PersonCatalogue
+# PeopleCatalogue
