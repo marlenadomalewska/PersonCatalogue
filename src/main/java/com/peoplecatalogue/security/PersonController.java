@@ -1,4 +1,4 @@
-package com.peoplecatalogue.domain.controllers;
+package com.peoplecatalogue.security;
 
 import java.util.Collection;
 
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.peoplecatalogue.db.PersonRepository;
-import com.peoplecatalogue.domain.objects.Person;
+import com.peoplecatalogue.data.entity.Person;
+import com.peoplecatalogue.data.service.PersonRepository;
 
 @RestController
 public class PersonController {

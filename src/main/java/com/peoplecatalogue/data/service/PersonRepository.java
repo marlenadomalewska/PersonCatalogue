@@ -1,4 +1,4 @@
-package com.peoplecatalogue.db;
+package com.peoplecatalogue.data.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,9 +12,9 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import com.peoplecatalogue.domain.objects.Person;
-import com.peoplecatalogue.domain.objects.PersonAddress;
-import com.peoplecatalogue.domain.objects.PersonDish;
+import com.peoplecatalogue.data.entity.Person;
+import com.peoplecatalogue.data.entity.PersonAddress;
+import com.peoplecatalogue.data.entity.PersonDish;
 
 @Repository
 public class PersonRepository {
@@ -40,7 +40,7 @@ public class PersonRepository {
 			+ "a.id AS a_id,"
 			+ "a.city,"
 			+ "a.street,"
-			+ "a.house_number."
+			+ "a.house_number,"
 			+ "a.postal_code,"
 			+ "d.id AS d_id,"
 			+ "d.name "

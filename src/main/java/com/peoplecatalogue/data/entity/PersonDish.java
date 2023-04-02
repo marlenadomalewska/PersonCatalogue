@@ -1,4 +1,4 @@
-package com.peoplecatalogue.domain.objects;
+package com.peoplecatalogue.data.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
