@@ -46,8 +46,8 @@ public class PeopleGridView extends VerticalLayout {
 
 	private void initGrid() {
 		grid = new Grid<>(Person.class, false);
-		grid.addColumn(Person::getFirstName).setHeader("First name").setAutoWidth(true);
-		grid.addColumn(Person::getLastName).setHeader("Last name").setAutoWidth(true);
+		grid.addColumn(Person::getFirstName).setHeader("First name").setWidth("700px");
+		grid.addColumn(Person::getLastName).setHeader("Last name").setWidth("700px");
 		grid.addComponentColumn(source -> new HorizontalLayout(
 			initButtonEdit(source), initButtonDelete(source))).setAutoWidth(true);
 	}

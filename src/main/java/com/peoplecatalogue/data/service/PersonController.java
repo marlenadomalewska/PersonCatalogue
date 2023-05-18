@@ -1,6 +1,7 @@
-package com.peoplecatalogue.security;
+package com.peoplecatalogue.data.service;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.peoplecatalogue.data.entity.Person;
-import com.peoplecatalogue.data.service.PersonRepository;
 
 @RestController
 public class PersonController {
@@ -29,7 +29,7 @@ public class PersonController {
 	}
 
 	@GetMapping("/{id}")
-	public Person getPerson(@PathVariable("id") int id) {
+	public Optional<Person> getPerson(@PathVariable("id") int id) {
 		return repository.personGetById(id);
 	}
 
@@ -49,12 +49,10 @@ public class PersonController {
 		repository.personUpdate(person);
 	}
 
-	/*
-	 * @PatchMapping("/{id}") public void changeFirstName(@PathVariable("id") int
+	/* @PatchMapping("/{id}") public void changeFirstName(@PathVariable("id") int
 	 * id,
 	 * 
 	 * @RequestParam(value = "firstName", defaultValue = "") String firstName) {
-	 * repository.getPersonById(id).setFirstName(firstName); }
-	 */
+	 * repository.getPersonById(id).setFirstName(firstName); } */
 
 }

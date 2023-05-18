@@ -1,15 +1,20 @@
 package com.peoplecatalogue.data.service;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.peoplecatalogue.data.entity.Person;
@@ -32,7 +37,7 @@ public class PersonRepository {
 		return jdbcTemplate.query("SELECT id, first_name, last_name FROM person;", lambdaMapper);
 	}
 
-	public Person personGetById(int id) {
+	public Optional<Person> personGetById(int id) {
 		return jdbcTemplate.query("SELECT "
 			+ "p.id AS p_id,"
 			+ "p.first_name, "
@@ -50,10 +55,10 @@ public class PersonRepository {
 			+ "WHERE p.id=?;", rsExtractor, id);
 	}
 
-	private ResultSetExtractor<Person> rsExtractor = new ResultSetExtractor<Person>() {
+	private ResultSetExtractor<Optional<Person>> rsExtractor = new ResultSetExtractor<Optional<Person>>() {
 
 		@Override
-		public Person extractData(ResultSet rs) throws SQLException, DataAccessException {
+		public Optional<Person> extractData(ResultSet rs) throws SQLException, DataAccessException {
 			Person person = null;
 			if (rs.next()) {
 				person = new Person();
@@ -77,13 +82,13 @@ public class PersonRepository {
 				dishes.add(new PersonDish(rs.getInt("d_id"), rs.getString("name")));
 			}
 			person.setSignatureDishes(dishes);
-			return person;
+			return Optional.ofNullable(person);
 		}
 	};
 
 	public void personDelete(int id) {
 		jdbcTemplate.update("DELETE FROM dish WHERE id_person=?; " + "DELETE FROM address WHERE id_person=?;"
-			+ "DELETE FROM person WHERE id=?", id, id, id);
+			+ "DELETE FROM person WHERE id=?;", id, id, id);
 	}
 
 	public void addressDelete(int id) {
@@ -95,8 +100,22 @@ public class PersonRepository {
 	}
 
 	public void personAdd(Person person) {
-		jdbcTemplate.update("INSERT INTO person (first_name, last_name) VALUES (?,?)", person.getFirstName(),
-			person.getLastName());
+		String sql = "INSERT INTO person (first_name, last_name) VALUES (?,?) RETURNING id;";
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+
+		jdbcTemplate.update(connection -> {
+			PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, person.getFirstName());
+			ps.setString(2, person.getLastName());
+			return ps;
+		}, keyHolder);
+		int id = keyHolder.getKey().intValue();
+		if (person.getAddress() != null) {
+			addressAdd(id, person.getAddress());
+		}
+		if (person.getSignatureDishes() != null && person.getSignatureDishes().size() > 0) {
+			person.getSignatureDishes().stream().forEach(dish -> dishAdd(id, dish));
+		}
 	}
 
 	public void addressAdd(int idPerson, PersonAddress address) {
