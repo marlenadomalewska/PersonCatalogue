@@ -32,27 +32,27 @@ public class PersonRepository {
 	}
 
 	public Collection<Person> personGetAll() {
-		RowMapper<Person> lambdaMapper = (rs, rowNum) -> new Person(rs.getInt("id"), rs.getString("first_name"),
+		RowMapper<Person> lambdaMapper = (rs, rowNum) -> new Person(rs.getInt("id_p"), rs.getString("first_name"),
 			rs.getString("last_name"));
-		return jdbcTemplate.query("SELECT id, first_name, last_name FROM person;", lambdaMapper);
+		return jdbcTemplate.query("SELECT id_p, first_name, last_name FROM person;", lambdaMapper);
 	}
 
 	public Optional<Person> personGetById(int id) {
 		return jdbcTemplate.query("SELECT "
-			+ "p.id AS p_id,"
+			+ "p.id_p,"
 			+ "p.first_name, "
 			+ "p.last_name,"
-			+ "a.id AS a_id,"
+			+ "a.id_a,"
 			+ "a.city,"
 			+ "a.street,"
 			+ "a.house_number,"
 			+ "a.postal_code,"
-			+ "d.id AS d_id,"
-			+ "d.name "
+			+ "d.id_d,"
+			+ "d.dish_name "
 			+ "FROM person p "
-			+ "LEFT JOIN address a ON a.id_person=p.id "
-			+ "LEFT JOIN dish d ON d.id_person=p.id "
-			+ "WHERE p.id=?;", rsExtractor, id);
+			+ "LEFT JOIN address a ON a.id_p=p.id_p "
+			+ "LEFT JOIN dish d ON d.id_p=p.id_p "
+			+ "WHERE p.id_p=?;", rsExtractor, id);
 	}
 
 	private ResultSetExtractor<Optional<Person>> rsExtractor = new ResultSetExtractor<Optional<Person>>() {
@@ -62,11 +62,11 @@ public class PersonRepository {
 			Person person = null;
 			if (rs.next()) {
 				person = new Person();
-				person.setId(rs.getInt("p_id"));
+				person.setId(rs.getInt("id_p"));
 				person.setFirstName(rs.getString("first_name"));
 				person.setLastName(rs.getString("last_name"));
 				PersonAddress address = null;
-				int idAddress = rs.getInt("a_id");
+				int idAddress = rs.getInt("id_a");
 				if (idAddress != 0) {
 					address = new PersonAddress();
 					address.setId(idAddress);
@@ -79,28 +79,29 @@ public class PersonRepository {
 			}
 			List<PersonDish> dishes = new ArrayList<>();
 			while (rs.next()) {
-				dishes.add(new PersonDish(rs.getInt("d_id"), rs.getString("name")));
+				dishes.add(new PersonDish(rs.getInt("id_d"), rs.getString("dish_name")));
 			}
 			person.setSignatureDishes(dishes);
 			return Optional.ofNullable(person);
 		}
 	};
 
-	public void personDelete(int id) {
-		jdbcTemplate.update("DELETE FROM dish WHERE id_person=?; " + "DELETE FROM address WHERE id_person=?;"
-			+ "DELETE FROM person WHERE id=?;", id, id, id);
+	public void personDelete(int idP) {
+		jdbcTemplate.update("DELETE FROM dish WHERE id_p=?; "
+			+ "DELETE FROM address WHERE id_p=?;"
+			+ "DELETE FROM person WHERE id_p=?;", idP, idP, idP);
 	}
 
-	public void addressDelete(int id) {
-		jdbcTemplate.update("DELETE FROM address WHERE id=?;", id);
+	public void addressDelete(int idA) {
+		jdbcTemplate.update("DELETE FROM address WHERE id_a=?;", idA);
 	}
 
-	public void dishDelete(int id) {
-		jdbcTemplate.update("DELETE FROM dish WHERE id=?;", id);
+	public void dishDelete(int idD) {
+		jdbcTemplate.update("DELETE FROM dish WHERE id_d=?;", idD);
 	}
 
 	public void personAdd(Person person) {
-		String sql = "INSERT INTO person (first_name, last_name) VALUES (?,?) RETURNING id;";
+		String sql = "INSERT INTO person (first_name, last_name) VALUES (?,?) RETURNING id_p;";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		jdbcTemplate.update(connection -> {
@@ -118,28 +119,28 @@ public class PersonRepository {
 		}
 	}
 
-	public void addressAdd(int idPerson, PersonAddress address) {
+	public void addressAdd(int idP, PersonAddress address) {
 		jdbcTemplate.update(
-			"INSERT INTO address (city, street, house_number, postal_code, person_id) VALUES(?,?,?,?,?)",
-			address.getCity(), address.getStreet(), address.getHouseNumber(), address.getPostalCode(), idPerson);
+			"INSERT INTO address (city, street, house_number, postal_code, id_p) VALUES(?,?,?,?,?)",
+			address.getCity(), address.getStreet(), address.getHouseNumber(), address.getPostalCode(), idP);
 	}
 
-	public void dishAdd(int idPerson, PersonDish dish) {
-		jdbcTemplate.update("INSERT INTO address (name, person_id) VALUES(?,?)", dish.getName(), idPerson);
+	public void dishAdd(int idP, PersonDish dish) {
+		jdbcTemplate.update("INSERT INTO dish (dish_name, id_p) VALUES(?,?)", dish.getName(), idP);
 	}
 
 	public void personUpdate(Person person) {
-		jdbcTemplate.update("UPDATE person SET first_name=?, last_name=? WHERE int id=?", person.getFirstName(),
+		jdbcTemplate.update("UPDATE person SET first_name=?, last_name=? WHERE id_p=?", person.getFirstName(),
 			person.getLastName(), person.getId());
 	}
 
 	public void addressUpdate(PersonAddress address) {
-		jdbcTemplate.update("UPDATE address SET city=?, street=?, house_number=?, postal_code=? WHERE int id=?",
+		jdbcTemplate.update("UPDATE address SET city=?, street=?, house_number=?, postal_code=? WHERE id_a=?",
 			address.getCity(), address.getStreet(), address.getHouseNumber(), address.getPostalCode(),
 			address.getId());
 	}
 
 	public void dishUpdate(PersonDish dish) {
-		jdbcTemplate.update("UPDATE dish SET name=? WHERE id=?", dish.getName(), dish.getId());
+		jdbcTemplate.update("UPDATE dish SET dish_name=? WHERE id_d=?", dish.getName(), dish.getId());
 	}
 }
